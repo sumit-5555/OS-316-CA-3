@@ -1,0 +1,228 @@
+#include<iostream>
+#include<fstream>
+#include<string.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<conio.h>
+using namespace std;
+class medicine
+{
+	private:
+		int n;
+		char cmp[20], title[20];
+		float price;
+		int exp;
+		int mfg;
+	public:
+		medicine()
+		{
+			n=0;
+			strcpy(title,"no title");
+			price=0;
+		}
+		void inputmedicinedata()
+		{   cout<<"name of company = ";
+		    cin>>cmp;
+		    cout<<"medicine name = ";
+			cin>>title;
+			cout<<"no.of strip = ";
+			cin>>n;
+			cout<<"price = ";
+			cin>>price;
+			cout<<"manufacture year = ";
+			cin>>mfg;
+			cout<<"expire year = ";
+			cin>>exp;
+		}
+		void showdata()
+		{
+			cout<<"       |  COMPANY NAME     | MEDICINE NAME   |   NO OF STRIPES   |   PRICE   |     MANUFACTURE YEAR   |   EXPIRE YEAR    |    "<<endl;
+			cout<<"             "<<cmp<<"           "<<title<<"              "<<n<<"             "<<price<<"           "<<mfg<<"         "<<exp<<"       "<<endl;
+		}
+			int storerecord();
+			void viewall();
+			void searchitem(char *);
+			void deleteitem(char*);
+			void edititem(char*);
+			
+};
+void medicine::edititem(char *t)
+{
+	fstream file;
+	file.open("file1.txt",ios::in|ios::out|ios::ate|ios::binary);
+	file.seekg(0);
+	file.read((char*)this,sizeof(*this));
+	while(!file.eof())
+	{
+		if(!strcmp(t,title))
+		{
+			inputmedicinedata();//over write
+			file.seekp(file.tellp()-sizeof(*this));
+			file.write((char*)this,sizeof(*this));
+		}
+		file.read((char*)this,sizeof(*this));	
+	}
+	file.close();
+}
+void medicine::deleteitem(char *t)//delete
+{
+	ifstream fin;
+	ofstream fout;
+	fin.open("file1.txt",ios::in|ios::binary);
+	if(!fin)
+	cout<<"\nFile ot Found";
+	else
+	{
+		getch();
+		fout.open("tempfile.txt",ios::out|ios::binary);
+		fin.read((char*)this,sizeof(*this));
+		while(!fin.eof())
+		{
+			if(strcmp(title,t))
+			fout.write((char*)this,sizeof(*this));
+			fin.read((char*)this,sizeof(*this));
+			
+		}
+		fin.close();
+		fout.close();
+		//getch();
+		remove("file1.txt");
+		//getch();
+		rename("tempfile.txt","file1.txt");
+	}
+}
+void medicine::searchitem(char *t)//for searching
+{
+	int counter=0;
+	ifstream fin;
+	fin.open("file1.txt",ios::in|ios::binary);
+	if(!fin)
+	cout<<"\n File not Found";
+	else
+	{
+		fin.read((char*)this,sizeof(*this));
+		while(!fin.eof())
+		{
+			if(!strcmp(t,title))
+			{
+				showdata();
+				counter++;
+			}
+			fin.read((char*)this,sizeof(*this));	
+		}
+		if(counter==0)
+		cout<<"\nRecord not found";
+		fin.close();
+	}
+}
+void medicine::viewall()
+{
+	ifstream fin;
+	fin.open("file1.txt",ios::in|ios::binary);
+	if(!fin)
+	{
+		cout<<"\n file not found";
+	}
+	else
+	{
+		fin.read((char*)this,sizeof(*this));
+		while(!fin.eof()) 
+		{
+		showdata();
+		
+			fin.read((char*)this,sizeof(*this));
+		}
+	}
+}
+int medicine::storerecord()
+{
+	if(n==0&&price==0)
+	{
+		cout<<"medicine detail is not intialze";
+		return(0);
+	}
+
+	else
+	{
+		ofstream fout;
+		fout.open("file1.txt",ios::app|ios::binary);
+		fout.write((char*)this,sizeof(*this));//write()is used to write,[ pass size of data ,collar object sddress]
+		fout.close();
+		return(1);
+	}
+}
+int menu()
+{
+	int choice;
+    cout<<endl;
+	cout<<"\n            ***************************!  MEDICINE RECORD MANAGEMENT SYSTEM !************************************ "  ; 
+	cout<<endl;
+	cout<<endl;                                                                                                                                                                                                                                                                                                                                                                                                        ;
+	cout<<"\n                             |            1. Insert medicine detail.                 |";
+	cout<<"\n                             |            2. View all medicine detail.               |";
+	cout<<"\n                             |            3. Search medicine detail.                 |";
+	cout<<"\n                             |            4. delete medicine detail.                 |";
+	cout<<"\n                             |            5. update medicine detail.                 |";
+	cout<<"\n                             |            6. exit.                                   |";
+	cout<<endl;
+	cout<<endl;
+	cout<<"\n            ***************************************************************************************************** ";
+	cout<<endl;
+	cout<<"\nenter option which you want - ";
+	cin>>choice;
+	return(choice);
+}
+	
+
+int main()
+{
+	char title[20];
+	
+	medicine b1;
+
+	while(1)
+	{
+		system("cls");
+		switch(menu())
+		{
+			case 1:
+				b1.inputmedicinedata();
+				b1.storerecord();
+				cout<<"\n your medicine detail is successfully inserted -";
+				cout<<"\n press any key to continue...";
+				break;
+			case 2:
+				cout<<endl;
+				b1.viewall();
+				cout<<"\n press any key to continue...";
+				break;
+			case 3:
+				cout<<" \nenter the name of the medicine - ";
+				cin.ignore();
+				cin.getline(title,19);
+				b1.searchitem(title);
+				cout<<"\n press any key to continue...";
+				break;
+			case 4:
+				cout<<"\n enter the medicine name which you want to delete - ";
+				cin.ignore();	
+				cin.getline(title,19);
+				b1.deleteitem(title);
+				//	cout<<"RECORD DELETED"<<endl;
+				break;	
+			case 5:
+				cout<<"\nenter medicine to update record - ";
+				cin.ignore();
+				cin.getline(title,19);
+				b1.edititem(title);
+				break;
+			case 6:
+				cout<<"\n thank you for using this ";
+				cout<<"\n press any key to continue...";
+			default:
+				cout<<"WRONG CHOICE"<<endl;
+		}
+		getch();
+	}
+}
+
