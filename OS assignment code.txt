@@ -10,7 +10,6 @@
 #define LOG(...) \
   do {           \
   } while (false);
-#endif
 
 struct system_state {
   int resource_count;
@@ -27,10 +26,6 @@ struct request {
   int* resource_requests;
 
 } * request_info;
-
-/*
- * This function free all the dynamically allocated resources.
- */
 void free_dynamic_resource() {
   for (int a = 0; a < global_system_state->process_count; a++) {
     free(global_system_state->allocation_table[a]);
@@ -138,23 +133,13 @@ void input() {
   }
 };
 
-/*
-These are some useful math functions for easing the solving task
-a : available;
-b : allocated;
-c : required;
-*/
+
 bool vec_math_is_allocatable(int* a, int* b, int* c, int len) {
   for (int iter = 0; iter < len; iter++)
     if (a[iter] + b[iter] < c[iter]) return false;
   return true;
 }
-/*
-These are some useful math functions for easing the solving task
-a : available;
-b : allocated;
-c : required;
-*/
+
 void vec_math_allocate_and_free(int* a, int* b, int* c, int len) {
   assert(vec_math_is_allocatable(a, b, c, len));
   for (int iter = 0; iter < len; iter++) {
@@ -163,11 +148,6 @@ void vec_math_allocate_and_free(int* a, int* b, int* c, int len) {
   }
 }
 
-/*
- * a : allocated
- * b : requested
- * c : max_limit
- */
 
 bool vec_math_should_grant(int* a, int* b, int* c, int len) {
   for (int t = 0; t < len; t++)
